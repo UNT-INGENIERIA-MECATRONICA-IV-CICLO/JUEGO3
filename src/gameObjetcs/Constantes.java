@@ -7,13 +7,16 @@ package gameObjetcs;
  */
 public class Constantes {
     //Ventana 
-    public static final int ancho=1100;
-    public static final int altura=680;
+    public static final int ancho=1000;
+    public static final int altura=600;
     //Propiedades del jugador
     public static final int velDispara=300;
     public static final double rota=0.1;
     public static final double ACC=0.2;
     public static final double playermaxVel=7.0;
+    public static final long parpadearTime=200;
+    public static final long spawnTime=3000;
+    public static final long GAME_OVER_TIME=3000;
     //Propiedades de laser
     public static final double velLaser=15.0;
     //Meteoro
@@ -28,6 +31,12 @@ public class Constantes {
     public static double EnemAnguloRango = Math.PI / 2;
      
     public static final int enemScore=40;
+    public static final long UFO_SPAWN_RATE=10000;
     
-   
+    public static final String PLAY = "PLAY";
+	
+    public static final String EXIT = "EXIT";
+    
+    public static final int LOADING_BAR_WIDTH=500;
+    public static final int LOADING_BAR_HEIGHT=50;
 }

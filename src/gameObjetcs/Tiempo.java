@@ -15,7 +15,7 @@ public class Tiempo {
     private boolean running;
     public Tiempo(){
         delta=0;
-        lasTime=0;
+        lasTime=System.currentTimeMillis();
         running=false;
         
     }

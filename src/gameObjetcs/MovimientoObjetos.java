@@ -1,6 +1,7 @@
 
 package gameObjetcs;
 import graphics.Assets;
+import graphics.Sonido;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -17,6 +18,8 @@ public abstract class MovimientoObjetos extends GameObject {
     protected int ancho;
     protected int altura;
     protected GameState gameState;
+    private Sonido explo;
+    private boolean Dead;
     
     public MovimientoObjetos(Vector2D position,Vector2D velocidad,double maxVelocidad, BufferedImage texture,GameState gameState){
         
@@ -28,6 +31,8 @@ public abstract class MovimientoObjetos extends GameObject {
         ancho=texture.getWidth();
         altura=texture.getHeight();
         angulo=0;
+        explo=new Sonido(Assets.explo);
+        Dead=false;
     }
     protected void colision(){
         
@@ -38,7 +43,7 @@ public abstract class MovimientoObjetos extends GameObject {
             if(m.equals(this))
                 continue;
             double distance=m.getCenter().subtract(getCenter()).getMagnitude();
-            if(distance<m.ancho/2 + ancho/2 && movimientoObjetos.contains(this)){
+            if(distance<m.ancho/2 + ancho/2 && movimientoObjetos.contains(this) && !m.Dead && !Dead){
                 objectCollision(m, this);
             }
                 
@@ -46,7 +51,15 @@ public abstract class MovimientoObjetos extends GameObject {
          
     }
     private void objectCollision(MovimientoObjetos a,MovimientoObjetos b){
-        if(!(a instanceof Meteoro && b instanceof Meteoro)){
+        if(a instanceof Player &&((Player)a).isSpawning()){
+            return;
+        }
+         if(b instanceof Player &&((Player)b).isSpawning()){
+            return;
+        }
+       
+         
+         if(!(a instanceof Meteoro && b instanceof Meteoro)){
             gameState.playExplosion(getCenter());
             a.Destruir();
             b.Destruir();
@@ -54,11 +67,17 @@ public abstract class MovimientoObjetos extends GameObject {
         
     }
     protected void Destruir(){
-        gameState.getMovimientoObjetos().remove(this);
+        Dead=true;
+        if(!(this instanceof Laser) )
+            explo.play();
     }
     protected  Vector2D getCenter()
     {
         return new Vector2D(position.getX()+ ancho/2, position.getY()+ altura/2);
+    }
+    
+    public boolean isDead(){
+        return Dead;
     }
    
 }

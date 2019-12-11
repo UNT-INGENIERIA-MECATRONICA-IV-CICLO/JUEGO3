@@ -1,10 +1,20 @@
 
 package graphics;
 
+import java.awt.Font;
 import java.awt.image.BufferedImage;
+import javax.sound.sampled.Clip;
+
 
 
 public class Assets {
+    
+    public static boolean loaded=false;
+    public static float count=0;
+    public static float MAX_COUNT=460;
+    
+            
+            
     public static BufferedImage player;
    
     public static BufferedImage speed;
@@ -26,35 +36,69 @@ public class Assets {
     public static BufferedImage []explosion=new BufferedImage[1]; 
     public static BufferedImage []numeros=new BufferedImage[11]; 
     
-    public static void init(){
-       space=Loader.ImageLoader("/ships/space.png");
-       player=Loader.ImageLoader("/ships/Dr_opt_opt.png");
-       speed=Loader.ImageLoader("/efectos/fire04.png");
+    
+    public static Font fontBig;
+    public static Font fontMed;
+    
+    public static Clip  musica,playerlaser,explo,playerLoose,ufoShoot;
+    public static BufferedImage blueBtn;
+    public static BufferedImage greyBtn;
+    
+    public static void init() {
+       space=loadImage("/ships/space.png");
+       player=loadImage("/ships/Dr_opt_opt.png");
+       speed=loadImage("/efectos/fire04.png");
        
-       azullaser=Loader.ImageLoader("/laser/laserBlue16.png");
-       verdelaser=Loader.ImageLoader("/laser/laserGreen10.png");
-       rojolaser= Loader.ImageLoader("/laser/laserRed16.png");   
+       azullaser=loadImage("/laser/laserBlue16.png");
+       verdelaser=loadImage("/laser/laserGreen10.png");
+       rojolaser= loadImage("/laser/laserRed16.png");   
       
        
        for(int i=0;i<grande.length;i++)
-           grande[i]=Loader.ImageLoader("/meteoros/grande"+(i+1)+".png");
+           grande[i]=loadImage("/meteoros/grande"+(i+1)+".png");
        
        for(int i=0;i<grande.length;i++)
-           mediano[i]=Loader.ImageLoader("/meteoros/mediano"+(i+1)+".png");
+           mediano[i]=loadImage("/meteoros/mediano"+(i+1)+".png");
        
        for(int i=0;i<grande.length;i++)
-           pequeño[i]=Loader.ImageLoader("/meteoros/pequeño"+(i+1)+".png");
+           pequeño[i]=loadImage("/meteoros/pequeño"+(i+1)+".png");
        
       
        
        for(int i=0;i<explosion.length;i++)
-           explosion[i]=Loader.ImageLoader("/efectos/explo"+i+".png");
+           explosion[i]=loadImage("/efectos/explo"+i+".png");
        
        for(int i=0;i<numeros.length;i++)
-           numeros[i]=Loader.ImageLoader("/numeros/"+i+".png");
+           numeros[i]=loadImage("/numeros/"+i+".png");
        
        
-       enemigo= Loader.ImageLoader("/ships/ene_opt.png");  
-       life= Loader.ImageLoader("/otros/life.png"); 
-   } 
+       enemigo= loadImage("/ships/ene_opt.png");  
+       life= loadImage("/otros/life.png"); 
+       
+       fontBig=loadFont("/fuente/futureFont.ttf",42);
+       fontMed=loadFont("/fuente/futureFont.ttf",20);
+  
+       musica=loadSonido("/sonidos/tullegaste.wav");
+       playerlaser=loadSonido("/sonidos/Playerlaser.wav");
+       explo=loadSonido("/sonidos/explosion.wav");
+       playerLoose=loadSonido("/sonidos/playerLoose.wav");
+       ufoShoot=loadSonido("/sonidos/ufoShoot.wav");
+               
+       greyBtn = loadImage("/ui/grey_button01.png");
+       blueBtn = loadImage("/ui/blue_button04.png");
+       //=======================================================
+       loaded=true;
+    } 
+    public static BufferedImage loadImage(String path){
+        count ++;
+        return Loader.ImageLoader(path);
+    }
+    public static Font loadFont(String path, int size){
+        count ++;
+        return Loader.loadFont(path, size);
+    }
+    public static Clip loadSonido(String path){
+        count++;
+        return Loader.loadSonido(path);
+    }
 }

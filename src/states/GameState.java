@@ -9,38 +9,74 @@ package states;
  *
  * @author Cabrón en que lo cambie!
  */
+
 import gameObjetcs.Constantes;
 import gameObjetcs.Enemigo;
+import gameObjetcs.Mensajes;
 import gameObjetcs.Meteoro;
 import gameObjetcs.MovimientoObjetos;
 import gameObjetcs.Player;
 import gameObjetcs.Tamaños;
+import gameObjetcs.Tiempo;
 import graphics.Animacion;
 import graphics.Assets;
+import graphics.Sonido;
+import graphics.Texto;
+import java.awt.Color;
+
+
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+
+
+
 import math.Vector2D;
-public class GameState {
+public class GameState extends State{
+    public static final Vector2D PLAYER_START_POSITION = new Vector2D(Constantes.ancho/2 - Assets.player.getWidth()/2,
+			Constantes.altura/2 - Assets.player.getHeight()/2);
     private Player player;
     private ArrayList<MovimientoObjetos> movimientoObjetos=new ArrayList<MovimientoObjetos>();
     private ArrayList<Animacion> explosion=new ArrayList<Animacion>();
+    private ArrayList<Mensajes> mensajes = new ArrayList<Mensajes>();
+    
     private int score=0;
     private int lifes=3;
     private int meteoro;
+    private int waves=1;
+    private Sonido musica,playerlaser;
+    private Tiempo gameOverTimer;
+    private boolean gameOver;
+    private Tiempo ufoSpawner;
+    
     
     
     public GameState(){
-        player=new Player(new Vector2D(350,300),new Vector2D(),6,Assets.player,this);
+        player=new Player(PLAYER_START_POSITION,new Vector2D(),Constantes.playermaxVel,Assets.player,this);
+        gameOverTimer=new Tiempo();
+        gameOver=false;
         movimientoObjetos.add(player);
         meteoro=2;
         starWave();
+        musica=new Sonido(Assets.musica);
+        playerlaser=new Sonido(Assets.playerlaser);
+        musica.loop();
+        
+        musica.changeVolumen( -11.0f);
+        playerlaser.changeVolumen( -5.0f);
+        
+        ufoSpawner=new Tiempo();
+        ufoSpawner.run((long) Constantes.EnemAnguloRango);
     }
     
-    public void addScore(int value){
+    
+    public void addScore(int value,Vector2D position){
         score+=value;
+        mensajes.add(new Mensajes (position,true,"+"+value+" score",Color.BLACK,false,Assets.fontMed))
+        ;
     }
     public void divideMeteoro(Meteoro meteoro){
         Tamaños tamaño=meteoro.getTamaños();
@@ -75,6 +111,11 @@ public class GameState {
         
     }
     private void starWave(){
+        mensajes.add(new Mensajes(new Vector2D(Constantes.ancho/2, Constantes.altura/2), true,
+				"NIVEL "+waves, Color.BLACK, true, Assets.fontBig));
+        
+        
+        
         double x,y;
         for(int i=0;i<meteoro;i++){
             x=i%2==0?Math.random()*Constantes.ancho:0;
@@ -92,14 +133,14 @@ public class GameState {
             
         
         }
-        meteoro+=1;
-        spawnEnemigo();
+        meteoro++;
+        
     }
     public void playExplosion(Vector2D position){
         explosion.add(new Animacion(
-        Assets.explosion,
-        50,
-        position.subtract(new Vector2D(Assets.explosion[0].getWidth()/2,Assets.explosion[0].getHeight()/2))));
+            Assets.explosion,
+            50,
+            position.subtract(new Vector2D(Assets.explosion[0].getWidth()/2,Assets.explosion[0].getHeight()/2))));
     }
     private void spawnEnemigo(){
         int rand= (int)(Math.random()*2);
@@ -136,9 +177,15 @@ public class GameState {
         
     }
     public void actualizar(){
-        for(int i=0;i<movimientoObjetos.size();i++)
-            movimientoObjetos.get(i).actualizar();
-        
+        for(int i=0;i<movimientoObjetos.size();i++){
+            MovimientoObjetos mo=movimientoObjetos.get(i);
+            
+            mo.actualizar();
+            if(mo.isDead()){
+               movimientoObjetos.remove(i);
+               i--;
+            }
+        }
         for(int i=0;i<explosion.size();i++){
             Animacion anim = explosion.get(i);
             anim.actualizar();
@@ -147,8 +194,17 @@ public class GameState {
             }   
         }
         
+        if(gameOver && !gameOverTimer.isRunning()){
+            State.cambiarEstado(new MenuState());
+        }
+        
+        if(!ufoSpawner.isRunning()){
+            ufoSpawner.run(Constantes.UFO_SPAWN_RATE);
+            spawnEnemigo();
+        }
+        gameOverTimer.actualizar();
+        ufoSpawner.actualizar();
        
-            
         //Nueva ola de meteoros
         for(int i=0;i<movimientoObjetos.size();i++)
              if(movimientoObjetos.get(i) instanceof Meteoro)
@@ -164,6 +220,12 @@ public class GameState {
         Graphics2D g2d=(Graphics2D)g;
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BILINEAR );
         
+        for(int i=0;i<mensajes.size();i++){
+            mensajes.get(i).dibujar(g2d);
+            if(mensajes.get(i).isDead())
+                mensajes.remove(i);
+        }
+        
         for(int i=0;i<movimientoObjetos.size();i++)
             movimientoObjetos.get(i).dibujar(g);
         
@@ -174,10 +236,11 @@ public class GameState {
          }
          drawScore(g);
          drawVida(g);
+         //Texto.dibujarTexto(g,"NIVEL "+waves,new Vector2D(Constantes.ancho/2,Constantes.altura/2),true,Color.BLACK,Assets.fontBig);    
     }
     private void drawScore(Graphics g){
         //Dibujamos el score
-        Vector2D posi=new Vector2D(1000,25);
+        Vector2D posi=new Vector2D(900,25);
         
         String scoreToString= Integer.toString(score);
         for( int i=0;i<scoreToString.length();i++){
@@ -191,6 +254,8 @@ public class GameState {
     }
      private void drawVida(Graphics g){
         //Dibujamos el score
+        if(lifes<1)
+            return;
         Vector2D vidaposi=new Vector2D(25,25);
         g.drawImage(Assets.life,(int)vidaposi.getX(),(int)vidaposi.getY(),null);
          g.drawImage(Assets.numeros[10],(int)vidaposi.getX()+40,
@@ -217,10 +282,33 @@ public class GameState {
         
   
     }
+     public ArrayList<Mensajes> getMensajes() {
+        return mensajes;
+     }
     public Player getPlayer(){
         return player;
     }
+    public boolean restarVida(){
+        lifes --;
+        return lifes>0 ;
+    }
     
+    public void gameOver(){
+        Mensajes gameOverMsg=new Mensajes(
+                PLAYER_START_POSITION,
+                true,
+                "GAME OVER",
+                Color.BLACK,
+                true,
+                Assets.fontBig
+                );
+        this.mensajes.add(gameOverMsg);
+        gameOverTimer.run(Constantes.GAME_OVER_TIME);
+        gameOver=true;
+    
+    }
+
+   
 }
 
 
