@@ -15,6 +15,7 @@ import java.awt.GradientPaint;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 
 import math.Vector2D;
 
@@ -26,11 +27,14 @@ public class LoadingState extends State {
     
     private Thread loadingThread;
     private Font font;
+     private BufferedImage cargando;
     public LoadingState(Thread loadingThread){
         this.loadingThread=loadingThread;
         this.loadingThread.start();
         font=Loader.loadFont("/fuente/futureFont.ttf",38);
-    }
+        cargando= Loader.ImageLoader("/ships/Fondo_opt.jpg");
+       
+    }   
     @Override
     public void actualizar() {
       if(Assets.loaded){
@@ -52,7 +56,7 @@ public class LoadingState extends State {
         Constantes.ancho/2 + Constantes.LOADING_BAR_WIDTH/2,
         Constantes.altura/2 + Constantes.LOADING_BAR_HEIGHT/2,
         Color.BLUE);
-       
+       g.drawImage( cargando , 0, 0, Constantes.ancho, Constantes.altura, null);
        Graphics2D g2d=(Graphics2D)g;
        g2d.setPaint(gp);
        float percentage = (Assets.count / Assets.MAX_COUNT);

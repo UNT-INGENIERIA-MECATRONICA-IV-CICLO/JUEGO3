@@ -11,22 +11,19 @@ public class Assets {
     
     public static boolean loaded=false;
     public static float count=0;
-    public static float MAX_COUNT=460;
+    public static float MAX_COUNT=100;
     
             
             
     public static BufferedImage player;
    
     public static BufferedImage speed;
+    public static BufferedImage screen;
    
     public static BufferedImage azullaser,verdelaser,rojolaser;
     public static BufferedImage space;
     public static BufferedImage enemigo;
     public static BufferedImage life;
-    
-   
-   
-    
     
     public static BufferedImage []grande=new BufferedImage[1];
     public static BufferedImage []mediano=new BufferedImage[1];
@@ -44,10 +41,15 @@ public class Assets {
     public static BufferedImage blueBtn;
     public static BufferedImage greyBtn;
     
+    
     public static void init() {
+        for (int j =0; j<3; j++)
+        {
+       
        space=loadImage("/ships/space.png");
        player=loadImage("/ships/Dr_opt_opt.png");
        speed=loadImage("/efectos/fire04.png");
+       screen=loadImage("/ships/Fondo_opt.jpg");
        
        azullaser=loadImage("/laser/laserBlue16.png");
        verdelaser=loadImage("/laser/laserGreen10.png");
@@ -86,6 +88,8 @@ public class Assets {
                
        greyBtn = loadImage("/ui/grey_button01.png");
        blueBtn = loadImage("/ui/blue_button04.png");
+       
+        }
        //=======================================================
        loaded=true;
     } 

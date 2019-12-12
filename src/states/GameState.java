@@ -21,7 +21,9 @@ import gameObjetcs.Tiempo;
 import graphics.Animacion;
 import graphics.Assets;
 import graphics.Sonido;
-import graphics.Texto;
+
+import io.JSONParser;
+import io.ScoreData;
 import java.awt.Color;
 
 
@@ -30,9 +32,8 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
-
-
 
 import math.Vector2D;
 public class GameState extends State{
@@ -44,8 +45,8 @@ public class GameState extends State{
     private ArrayList<Mensajes> mensajes = new ArrayList<Mensajes>();
     
     private int score=0;
-    private int lifes=3;
-    private int meteoro;
+    private int lifes=5;
+    private int meteoro=0;
     private int waves=1;
     private Sonido musica,playerlaser;
     private Tiempo gameOverTimer;
@@ -59,8 +60,9 @@ public class GameState extends State{
         gameOverTimer=new Tiempo();
         gameOver=false;
         movimientoObjetos.add(player);
-        meteoro=2;
-        starWave();
+        meteoro=3;
+        
+        
         musica=new Sonido(Assets.musica);
         playerlaser=new Sonido(Assets.playerlaser);
         musica.loop();
@@ -70,13 +72,13 @@ public class GameState extends State{
         
         ufoSpawner=new Tiempo();
         ufoSpawner.run((long) Constantes.EnemAnguloRango);
+        
     }
     
     
     public void addScore(int value,Vector2D position){
         score+=value;
-        mensajes.add(new Mensajes (position,true,"+"+value+" score",Color.BLACK,false,Assets.fontMed))
-        ;
+        mensajes.add(new Mensajes (position,true,"+"+value+" score",Color.BLACK,false,Assets.fontMed));
     }
     public void divideMeteoro(Meteoro meteoro){
         Tamaños tamaño=meteoro.getTamaños();
@@ -114,8 +116,6 @@ public class GameState extends State{
         mensajes.add(new Mensajes(new Vector2D(Constantes.ancho/2, Constantes.altura/2), true,
 				"NIVEL "+waves, Color.BLACK, true, Assets.fontBig));
         
-        
-        
         double x,y;
         for(int i=0;i<meteoro;i++){
             x=i%2==0?Math.random()*Constantes.ancho:0;
@@ -130,10 +130,10 @@ public class GameState extends State{
                     this,
                     Tamaños.grande
                     ));
-            
-        
         }
         meteoro++;
+        
+        waves++;
         
     }
     public void playExplosion(Vector2D position){
@@ -176,6 +176,7 @@ public class GameState extends State{
             this));
         
     }
+    @Override
     public void actualizar(){
         for(int i=0;i<movimientoObjetos.size();i++){
             MovimientoObjetos mo=movimientoObjetos.get(i);
@@ -195,8 +196,19 @@ public class GameState extends State{
         }
         
         if(gameOver && !gameOverTimer.isRunning()){
+            /**
+            try {
+                ArrayList< ScoreData> dataList= JSONParser.readFile();
+                dataList.add(new ScoreData(score));
+                JSONParser.writeFile(dataList);
+            
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            * */
             State.cambiarEstado(new MenuState());
         }
+        
         
         if(!ufoSpawner.isRunning()){
             ufoSpawner.run(Constantes.UFO_SPAWN_RATE);
@@ -206,9 +218,11 @@ public class GameState extends State{
         ufoSpawner.actualizar();
        
         //Nueva ola de meteoros
-        for(int i=0;i<movimientoObjetos.size();i++)
-             if(movimientoObjetos.get(i) instanceof Meteoro)
+        for(int i=0;i<movimientoObjetos.size();i++){
+             if(movimientoObjetos.get(i) instanceof Meteoro){
                  return; 
+             }
+        }
         
         starWave();
        
@@ -216,6 +230,7 @@ public class GameState extends State{
             
         
     }
+    @Override
     public void dibujar(Graphics g){
         Graphics2D g2d=(Graphics2D)g;
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BILINEAR );
@@ -226,9 +241,9 @@ public class GameState extends State{
                 mensajes.remove(i);
         }
         
-        for(int i=0;i<movimientoObjetos.size();i++)
+        for(int i=0;i<movimientoObjetos.size();i++){
             movimientoObjetos.get(i).dibujar(g);
-        
+        }
          for(int i=0;i<explosion.size();i++){
             Animacion anim = explosion.get(i);
             g2d.drawImage(anim.getCurrentFrame(), (int)anim.getPosition().getX(), (int)anim.getPosition().getY(),null);
@@ -307,7 +322,9 @@ public class GameState extends State{
         gameOver=true;
     
     }
-
+    public ArrayList<Mensajes> geMensajes(){
+        return mensajes;
+}
    
 }
 

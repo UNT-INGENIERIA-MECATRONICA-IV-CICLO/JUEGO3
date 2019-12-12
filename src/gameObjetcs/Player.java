@@ -6,7 +6,7 @@
 package gameObjetcs;
 
 
-import Main.Ventana;
+import VENTANA.Ventana;
 import graphics.Assets;
 import graphics.Sonido;
 import input.KeyBoard;

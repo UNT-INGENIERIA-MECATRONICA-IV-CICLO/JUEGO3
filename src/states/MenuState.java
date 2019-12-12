@@ -23,34 +23,47 @@ public class MenuState extends State {
     public MenuState(){
         boton = new ArrayList<Botones>();
 		
-		boton.add(new Botones(
-				Assets.greyBtn,
-				Assets.blueBtn,
-				Constantes.ancho/2   - Assets.greyBtn.getWidth()/2,
-				Constantes.altura/2  - Assets.greyBtn.getHeight(),
-				Constantes.PLAY,
-				new Accion() {
-					@Override
-					public void doAccion() {
-						State.cambiarEstado(new GameState());
-					}
-				}
-				));
-		
-		boton.add(new Botones(
-				Assets.greyBtn,
-				Assets.blueBtn,
-				Constantes.ancho / 2 - Assets.greyBtn.getWidth()/2,
-				Constantes.altura / 2 + Assets.greyBtn.getHeight()/2 ,
-				Constantes.EXIT,
-				new Accion() {
-					@Override
-					public void doAccion() {
-						System.exit(0);
-					}
-				}
-				));
-        
+        boton.add(new Botones(
+                        Assets.greyBtn,
+                        Assets.blueBtn,
+                        Constantes.ancho/2   - Assets.greyBtn.getWidth()/2,
+                        Constantes.altura/2  - Assets.greyBtn.getHeight()*2,
+                        Constantes.PLAY,
+                        new Accion() {
+                                @Override
+                                public void doAccion() {
+                                    State.cambiarEstado(new GameState());
+                                }
+                        }
+                        ));
+
+        boton.add(new Botones(
+                        Assets.greyBtn,
+                        Assets.blueBtn,
+                        Constantes.ancho /2 - Assets.greyBtn.getWidth()/2,
+                        Constantes.altura /2  ,
+                        Constantes.EXIT,
+                        new Accion() {
+                                @Override
+                                public void doAccion() {
+                                        System.exit(0);
+                                }
+                        }
+                        ));
+
+        boton.add(new Botones(
+                        Assets.greyBtn,
+                        Assets.blueBtn,
+                        Constantes.ancho / 2 - Assets.greyBtn.getWidth()/2,
+                        Constantes.altura / 2 + Assets.greyBtn.getHeight()*2 ,
+                        Constantes.HIGH_SCORES,
+                        new Accion() {
+                                @Override
+                                public void doAccion() {
+                                        State.cambiarEstado(new ScoreDato());
+                                }
+                        }
+                        ));
     }
 
     @Override

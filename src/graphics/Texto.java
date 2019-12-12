@@ -18,7 +18,7 @@ public class Texto {
         if(center){
             FontMetrics fm= g.getFontMetrics();
             position.setX(position.getX()-fm.stringWidth(text)/2);
-            position.setY(position.getX()-fm.getHeight()/2);
+            position.setY(position.getY()-fm.getHeight()/2);
         }
         
         g.drawString(text,(int)position.getX() ,(int)position.getY() );
